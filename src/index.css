@@ -24,3 +24,20 @@ h1 {
 h2 {
   @apply text-2xl mb-2;
 }
+
+.fastest-label {
+  @apply 
+    text-white
+    absolute
+    -right-4
+    transform
+    -rotate-90
+    top-[22%]
+    text-center
+    pt-1
+    bg-purple-600
+    w-[57px]
+    h-8
+    text-sm
+    animate-pulse;
+}

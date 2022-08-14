@@ -1,31 +1,34 @@
 import { FC, forwardRef } from "react";
 import FlipMove from "react-flip-move";
 import { Timing } from "../types";
+import addSign from "../utils/addSign";
 
 type TableProps = {
   data: Timing[];
 };
 
-const getStyle = (pc: number | undefined): string => {
-  const style = "text-white ";
-  if (!pc) return "";
-  return style + (pc > 0 ? "bg-green-700" : "bg-red-700");
+const getClasses = (r: Timing): string => {
+  let style = "text-white ";
+  if (!r.positionChange) return "";
+  style += r.positionChange > 0 ? "bg-green-700" : "bg-red-700";
+  return style;
 };
 
-const FunctionalRow = forwardRef<HTMLTableRowElement, Timing>(
-  ({ positionChange, position, driverId, time }, ref) => (
-    <tr ref={ref} key={driverId}>
-      <td className={getStyle(positionChange)}>{position}</td>
-      <td className={getStyle(positionChange)}>{driverId}</td>
-      <td className={getStyle(positionChange)}>{time}</td>
-      {positionChange && (
-        <td className={getStyle(positionChange)}>
-          {(positionChange < 0 ? "" : "+") + positionChange}
-        </td>
-      )}
+const FunctionalRow = forwardRef<HTMLTableRowElement, Timing>((r, ref) => {
+  const bg = getClasses(r);
+  return (
+    <tr ref={ref} key={r.driverId}>
+      <td className={bg}>{r.position}</td>
+      <td className={bg}>{r.driverId}</td>
+      <td className={bg}>{r.time}</td>
+      <td className={`${bg} relative`}>
+        {r.positionChange ? <p>{addSign(r.positionChange)}</p> : <p>--</p>}
+        {/* fastest label */}
+        {r.fastest && <div className="fastest-label">BEST</div>}
+      </td>
     </tr>
-  )
-);
+  );
+});
 
 const Table: FC<TableProps> = ({ data }) => {
   return (

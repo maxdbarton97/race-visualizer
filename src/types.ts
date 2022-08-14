@@ -3,6 +3,7 @@ export type Timing = {
   position: number;
   time: string;
   positionChange?: number;
+  fastest?: boolean;
 };
 
 export type Lap = {

@@ -78,12 +78,37 @@ const useRaceData = (): RaceDataHook => {
       };
     });
 
+  const calculateFastestLaps = (lapData: Lap[]) => {
+    let fastest = lapData[0].Timings[0];
+
+    const lapsWithFastest = lapData.map((lap, i) => {
+      const fastestOfLap = lap.Timings.reduce(
+        (f, l) => (l.time < f.time ? l : f),
+        fastest
+      );
+
+      const indexOfFastestDriver = lapData[i].Timings.findIndex(
+        ({ driverId }) => {
+          return fastestOfLap.driverId === driverId;
+        }
+      );
+
+      lap.Timings[indexOfFastestDriver].fastest = true;
+      fastest = fastestOfLap;
+      return lap;
+    });
+
+    return lapsWithFastest;
+  };
+
   const fetchData = async (): Promise<void> => {
     const lapData = await getLaps();
     const pitStopData = await getPitStops();
     const lapDataWithPositionChanges = addPositionChanges(lapData);
-    createEvents(lapDataWithPositionChanges, pitStopData);
-    setLaps(lapDataWithPositionChanges);
+    const lapsWithFastest = calculateFastestLaps(lapDataWithPositionChanges);
+    console.log(lapsWithFastest);
+    createEvents(lapsWithFastest, pitStopData);
+    setLaps(lapsWithFastest);
   };
 
   useEffect(() => {
