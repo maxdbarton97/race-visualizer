@@ -1,7 +1,12 @@
 import React, { FC, forwardRef, useEffect, useState } from "react";
 import FlipMove from "react-flip-move";
-import { Event, EventType } from "../types";
-import Collapse, { CollapseProps } from "./Collapse";
+import { Event, EventType } from "../../types";
+import Collapse, { CollapseProps } from "../Collapse";
+import FastestLap from "./components/FastestLap";
+import PitStop from "./components/PitStop";
+import PositionGained from "./components/PositionGained";
+import PositionLost from "./components/PositionLost";
+import StartEvent from "./components/StartEvent";
 
 type EventsProps = {
   events: Event[];
@@ -11,23 +16,11 @@ type EventsProps = {
 type EventsByLap = { [x: number]: Event[] };
 
 const EventComponentMap = {
-  [EventType.START]: ({ message }: Event) => <p key={message}>🏁 {message}</p>,
-  [EventType.POSITION_GAINED]: ({ message }: Event) => (
-    <p key={message} className="text-green-400">
-      ⬆ {message}
-    </p>
-  ),
-  [EventType.POSITION_LOST]: ({ message }: Event) => (
-    <p key={message} className="text-red-400">
-      ⬇ {message}
-    </p>
-  ),
-
-  [EventType.PIT_STOP]: ({ message }: Event) => (
-    <p key={message} className="text-red-400">
-      🛞 {message}
-    </p>
-  ),
+  [EventType.START]: StartEvent,
+  [EventType.POSITION_GAINED]: PositionGained,
+  [EventType.POSITION_LOST]: PositionLost,
+  [EventType.PIT_STOP]: PitStop,
+  [EventType.NEW_FASTEST_LAP]: FastestLap,
 };
 
 const FunctionalCollapse = forwardRef<HTMLDivElement, CollapseProps>(

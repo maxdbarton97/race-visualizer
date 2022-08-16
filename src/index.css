@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: titillium-web, sans-serif;
+  font-weight: 400;
 }
 
 code {
@@ -32,11 +34,11 @@ h2 {
     -right-4
     transform
     -rotate-90
-    top-[22%]
+    top-3
     text-center
     pt-1
     bg-purple-600
-    w-[57px]
+    w-[56px]
     h-8
     text-sm
     animate-pulse;

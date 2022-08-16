@@ -1,20 +1,35 @@
 /* eslint-disable no-param-reassign */
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Event, EventType, Lap, PitStop, Timing } from "../types";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import AppContext from "../context";
+import { Event, EventType, Lap, PitStop, Race, Timing } from "../types";
+import addPositionPrefix from "../utils/addPositionPrefix";
 import useAPI from "./useAPI";
 
 type RaceDataHook = {
-  laps: Lap[];
+  laps: Lap[] | undefined;
   currentLap: number;
   setCurrentLap: Dispatch<SetStateAction<number>>;
   events: Event[];
+  fetchData: (race: Race) => Promise<void>;
+  loading: boolean;
 };
 
 const useRaceData = (): RaceDataHook => {
   const { getLaps, getPitStops } = useAPI();
   const [currentLap, setCurrentLap] = useState<number>(1);
-  const [laps, setLaps] = useState<Lap[]>([]);
+  const [laps, setLaps] = useState<Lap[] | undefined>();
   const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    state: { selectedRace },
+  } = useContext(AppContext);
 
   const createEvents = (lapData: Lap[], pitStopData: PitStop[]) => {
     const tmpEvents: Event[] = [];
@@ -26,31 +41,41 @@ const useRaceData = (): RaceDataHook => {
           type: EventType.START,
         });
       } else {
-        // check driver positions
-        l.Timings.forEach(({ driverId, position, positionChange }) => {
-          if (positionChange)
-            if (positionChange > 0)
+        l.Timings.forEach(
+          ({ driverName, position, positionChange, newFastest }) => {
+            if (positionChange)
+              if (positionChange > 0)
+                tmpEvents.push({
+                  lap: i + 1,
+                  type: EventType.POSITION_GAINED,
+                  message: `${driverName} up to ${addPositionPrefix(position)}`,
+                });
+              else
+                tmpEvents.push({
+                  lap: i + 1,
+                  type: EventType.POSITION_LOST,
+                  message: `${driverName} down to ${addPositionPrefix(
+                    position
+                  )}`,
+                });
+
+            if (newFastest)
               tmpEvents.push({
                 lap: i + 1,
-                type: EventType.POSITION_GAINED,
-                message: `${driverId} has moved up to position ${position}`,
+                type: EventType.NEW_FASTEST_LAP,
+                message: `${driverName} fastest lap - ${newFastest}`,
               });
-            else
-              tmpEvents.push({
-                lap: i + 1,
-                type: EventType.POSITION_LOST,
-                message: `${driverId} has moved down to position ${position}`,
-              });
-        });
+          }
+        );
       }
 
       // add pitstops
-      pitStopData.forEach(({ lap, duration, driverId }) => {
+      pitStopData.forEach(({ lap, duration, driverName }) => {
         if (i + 1 === Number(lap))
           tmpEvents.push({
             lap: i + 1,
             type: EventType.PIT_STOP,
-            message: ` ${driverId} pit stop (${duration})`,
+            message: ` ${driverName} pitted - ${duration}`,
           });
       });
     });
@@ -93,7 +118,13 @@ const useRaceData = (): RaceDataHook => {
         }
       );
 
-      lap.Timings[indexOfFastestDriver].fastest = true;
+      // is the fastest driver still in the race?
+      if (indexOfFastestDriver >= 0) {
+        lap.Timings[indexOfFastestDriver].currentFastest = fastest.time;
+        if (fastestOfLap.time < fastest.time)
+          lap.Timings[indexOfFastestDriver].newFastest = fastestOfLap.time;
+      }
+
       fastest = fastestOfLap;
       return lap;
     });
@@ -101,25 +132,32 @@ const useRaceData = (): RaceDataHook => {
     return lapsWithFastest;
   };
 
-  const fetchData = async (): Promise<void> => {
-    const lapData = await getLaps();
-    const pitStopData = await getPitStops();
-    const lapDataWithPositionChanges = addPositionChanges(lapData);
-    const lapsWithFastest = calculateFastestLaps(lapDataWithPositionChanges);
-    console.log(lapsWithFastest);
-    createEvents(lapsWithFastest, pitStopData);
-    setLaps(lapsWithFastest);
+  const fetchData = async (race: Race): Promise<void> => {
+    setLoading(true);
+    const lapData = await getLaps(race);
+    if (lapData.length) {
+      const pitStopData = await getPitStops(race);
+      const lapDataWithPositionChanges = addPositionChanges(lapData);
+      const lapsWithFastest = calculateFastestLaps(lapDataWithPositionChanges);
+      createEvents(lapsWithFastest, pitStopData);
+      setLaps(lapsWithFastest.slice());
+    } else setLaps([]);
+
+    setCurrentLap(1);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (selectedRace) fetchData(selectedRace);
+  }, [selectedRace]);
 
   return {
     laps,
     currentLap,
     setCurrentLap,
     events,
+    fetchData,
+    loading,
   };
 };
 
