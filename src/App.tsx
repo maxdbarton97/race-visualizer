@@ -39,7 +39,6 @@ const App: FC = () => {
     dispatch,
   } = useContext(AppContext);
 
-  // fetch seasons
   const fetchSeasons = async (): Promise<void> => {
     const data = await getSeasons();
     dispatch({ type: "SET_SEASONS", payload: data });

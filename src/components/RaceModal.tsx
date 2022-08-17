@@ -23,7 +23,9 @@ const RaceModal: FC = () => {
   const handleRaceSelect = async (r: Race): Promise<void> => {
     dispatch({ type: "SET_SELECTED_RACE", payload: r });
     setTmpSelectedSeason(null);
-    inputRef.current!.checked = false;
+    if (inputRef.current) {
+      inputRef.current.checked = false;
+    }
   };
 
   const handleToggle = ({
