@@ -23,6 +23,10 @@ const mock: { data: Timing[] } = {
 };
 
 describe("Standings", () => {
+  beforeEach(() => {
+    render(<Standings data={mock.data} />);
+  });
+
   afterEach(cleanup);
 
   it("should display all driver", () => {
@@ -30,7 +34,6 @@ describe("Standings", () => {
     expect(standings?.childElementCount).toBe(2);
   });
   it("should display driver information", () => {
-    render(<Standings data={mock.data} />);
     const vettelRow = screen.getByText("Sebastian Vettel").parentElement;
     expect(vettelRow).toHaveTextContent("3");
     expect(vettelRow).toHaveTextContent("-");
@@ -39,20 +42,17 @@ describe("Standings", () => {
   });
 
   it("should sort by position", () => {
-    render(<Standings data={mock.data} />);
     const standings = document.querySelector("tbody");
     expect(standings?.firstChild).toHaveTextContent("Sebastian Vettel");
     expect(standings?.lastChild).toHaveTextContent("Lance Stroll");
   });
 
   it("should display position change as a positive or negative integer", () => {
-    render(<Standings data={mock.data} />);
     const vettelRow = screen.getByText("Lance Stroll").parentElement;
     expect(vettelRow).toHaveTextContent("+2");
   });
 
   it("should display best when driver has current fastest set", () => {
-    render(<Standings data={mock.data} />);
     const vettelRow = screen.getByText("Lance Stroll").parentElement;
     expect(vettelRow).toHaveTextContent("BEST");
   });
