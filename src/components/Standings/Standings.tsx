@@ -1,7 +1,7 @@
 import { FC, forwardRef } from "react";
 import FlipMove from "react-flip-move";
-import { Timing } from "../types";
-import addSign from "../utils/addSign";
+import { Timing } from "../../types";
+import addSign from "../../utils/addSign";
 
 type TableProps = {
   data: Timing[];
@@ -46,10 +46,12 @@ const Table: FC<TableProps> = ({ data }) => {
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-ignore */}
       <FlipMove typeName="tbody" className="overflow-auto">
-        {data.map((props) => (
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          <FunctionalRow {...props} key={props.driverId} />
-        ))}
+        {data
+          .sort((a, b) => (a.position > b.position ? 1 : -1))
+          .map((props) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <FunctionalRow {...props} key={props.driverId} />
+          ))}
       </FlipMove>
     </table>
   );

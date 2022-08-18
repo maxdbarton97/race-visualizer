@@ -1,34 +1,19 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChangeEvent, FC, useContext, useEffect } from "react";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faFlagCheckered,
-  faArrowUp,
-  faArrowDown,
-  faCar,
-  faStopwatch,
-  faFaceFrown,
-} from "@fortawesome/free-solid-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GridLoader } from "react-spinners";
 import Events from "./components/Events/Events";
 import Slider from "./components/Slider";
-import Standings from "./components/Standings";
+import Standings from "./components/Standings/Standings";
 import useRaceData from "./hooks/useRaceData";
 import RaceModal from "./components/RaceModal";
 import useAPI from "./hooks/useAPI";
 import AppContext from "./context";
+import registerIcons from "./register-icons";
 
-library.add(
-  faFlagCheckered,
-  faArrowUp,
-  faArrowDown,
-  faCar,
-  faStopwatch,
-  faFaceFrown
-);
+registerIcons();
 
 const App: FC = () => {
   const { getSeasons } = useAPI();
