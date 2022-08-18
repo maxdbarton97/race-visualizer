@@ -11,6 +11,7 @@ const Slider: FC<SliderProps> = ({ value = 1, laps, onChange }) => {
   return (
     <div className="flex flex-col w-full">
       <input
+        data-testid="Slider--input"
         type="range"
         min="1"
         max={laps}

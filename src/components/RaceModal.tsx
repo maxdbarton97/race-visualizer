@@ -57,6 +57,7 @@ const RaceModal: FC = () => {
               {seasons ? (
                 seasons.map((s) => (
                   <button
+                    data-testid="RaceModal--season-btn"
                     key={s}
                     type="button"
                     className="btn btn-accent my-2 mr-4"
@@ -74,6 +75,7 @@ const RaceModal: FC = () => {
               {races ? (
                 races.map((r) => (
                   <button
+                    data-testid="RaceModal--race-btn"
                     key={`${r.season}-${r.raceName}`}
                     type="button"
                     className="btn btn-primary my-2 mr-4"

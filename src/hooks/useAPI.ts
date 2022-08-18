@@ -51,22 +51,25 @@ const useAPI = () => {
     // extrapolate the data
     const laps: Lap[] = data.MRData.RaceTable.Races[0].Laps;
 
-    const lapsWithDriversAsync = laps.map(async (lap) => {
-      const TimingsAsync = lap.Timings.map(async (timing) => {
-        const driverName = await getDriverName(timing.driverId);
-        return {
-          driverId: timing.driverId,
-          driverName,
-          position: Number(timing.position),
-          time: timing.time,
-        };
-      });
-
-      const Timings = await Promise.all(TimingsAsync);
-      return { Timings };
+    // get driver names
+    const driverNamesAsync = laps[0].Timings.map(async ({ driverId }) => {
+      const name = await getDriverName(driverId);
+      return { driverId, name };
     });
 
-    const lapsWithDrivers = await Promise.all(lapsWithDriversAsync);
+    const driverNames = await Promise.all(driverNamesAsync);
+
+    const lapsWithDrivers = laps.map((lap) => ({
+      Timings: lap.Timings.map((timing) => ({
+        driverId: timing.driverId,
+        driverName:
+          driverNames.find(({ driverId: dId }) => timing.driverId === dId)
+            ?.name || timing.driverId,
+        position: Number(timing.position),
+        time: timing.time,
+      })),
+    }));
+
     return lapsWithDrivers;
   };
 

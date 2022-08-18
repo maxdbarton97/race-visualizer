@@ -51,7 +51,7 @@ const Events: FC<EventsProps> = ({ events, currentLap }) => {
     // https://github.com/joshwcomeau/react-flip-move/issues/273
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    <FlipMove>
+    <FlipMove data-testid="Events">
       {Object.entries(eventsByLap)
         .reverse()
         .map(([lapNumber, evs]) => (

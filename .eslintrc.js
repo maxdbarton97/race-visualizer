@@ -8,5 +8,6 @@ module.exports = {
       2,
       { namedComponents: "arrow-function" },
     ],
+    "@typescript-eslint/no-namespace": "off",
   },
 };
