@@ -1,5 +1,7 @@
 # F1 Race Visualiser
 
+![Preview](./preview.gif)
+
 ## Setup
 
 ```npm install```
@@ -22,6 +24,7 @@ Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run cypress`
+
 
 Runs a cypress test in a headless browser.
 
